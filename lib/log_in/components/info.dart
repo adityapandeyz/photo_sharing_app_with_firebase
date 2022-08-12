@@ -1,0 +1,114 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:photo_sharing_app_with_firebase/account_check/account_check.dart';
+import 'package:photo_sharing_app_with_firebase/forgot_passsword/forget_password.dart';
+import 'package:photo_sharing_app_with_firebase/home_screen/home_screen.dart';
+import 'package:photo_sharing_app_with_firebase/widgets/button_square.dart';
+import 'package:photo_sharing_app_with_firebase/widgets/input_field.dart';
+
+import '../../sign_up/sing_up_screen.dart';
+
+class Credentials extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final TextEditingController _emailTextController =
+      TextEditingController(text: "");
+  final TextEditingController _passwordTextController =
+      TextEditingController(text: "");
+
+  Credentials({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(50.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: CircleAvatar(
+              radius: 100,
+              backgroundImage: const AssetImage(
+                'assets/images/logo1.png',
+              ),
+              backgroundColor: Colors.orange.shade800,
+            ),
+          ),
+          const SizedBox(height: 15.0),
+          InputField(
+            hintText: 'Enter Email',
+            icon: Icons.email_rounded,
+            obscureText: false,
+            textEditingController: _emailTextController,
+          ),
+          const SizedBox(height: 15.0),
+          InputField(
+            hintText: 'Enter Password',
+            icon: Icons.lock_rounded,
+            obscureText: true,
+            textEditingController: _passwordTextController,
+          ),
+          const SizedBox(height: 15.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Forgot Password",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          ButtonSquare(
+            text: 'Login',
+            colors1: Colors.red,
+            colors2: Colors.redAccent,
+            press: () async {
+              try {
+                await _auth.signInWithEmailAndPassword(
+                  email: _emailTextController.text.toLowerCase(),
+                  password: _passwordTextController.text.trim(),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const HomeScreen(),
+                  ),
+                );
+              } catch (error) {
+                Fluttertoast.showToast(
+                  msg: error.toString(),
+                );
+              }
+            },
+          ),
+          AccountCheck(
+            login: true,
+            press: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SignUpScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
